@@ -14,13 +14,15 @@
   /* ---- sticky nav state ---- */
   var nav = document.querySelector('.nav');
   var hero = document.querySelector('.hero');
-  function onScroll() {
-    if (!nav) return;
-    var trigger = hero ? Math.min(window.innerHeight * 0.72, 620) : 30;
-    nav.classList.toggle('nav--solid', window.scrollY > trigger);
+  if (nav) {
+    if (hero && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        nav.classList.toggle('nav--solid', es[0].intersectionRatio < 0.3);
+      }, { threshold: [0, 0.3, 1] }).observe(hero);
+    } else {
+      nav.classList.add('nav--solid');
+    }
   }
-  onScroll();
-  window.addEventListener('scroll', onScroll, { passive: true });
 
   /* ---- mobile drawer ---- */
   var burger = document.querySelector('.burger');
@@ -83,6 +85,29 @@
     a.target = '_blank';
     a.rel = 'noopener';
   });
+
+  /* ---- rotating hero review ---- */
+  var rotq = document.getElementById('rotq');
+  if (rotq && !reduce) {
+    var quotes = [
+      { t: '"I can\'t speak highly enough of the beautiful job James did on the interior and exterior of my two storied house. He goes the extra mile."', w: 'Annie Trengrove \u00b7 Google review' },
+      { t: '"As an interior designer I would definitely recommend Everest Painters. They provided the high quality finish I was looking for."', w: 'Clementine Wallace \u00b7 Google review' },
+      { t: '"Quality workmanship, friendly reliable service and good value for money. I can without hesitation recommend them."', w: 'Iain Weir \u00b7 Google review' },
+      { t: '"Extremely professional, quality work, honest hard workers at reasonable rates. Thank you for another quality job. 5 stars!"', w: 'Richelle Courtney \u00b7 Google review' }
+    ];
+    var qt = document.getElementById('rotqText');
+    var qw = document.getElementById('rotqWho');
+    var qi = 0;
+    setInterval(function () {
+      rotq.classList.add('swap');
+      setTimeout(function () {
+        qi = (qi + 1) % quotes.length;
+        qt.textContent = quotes[qi].t;
+        qw.textContent = quotes[qi].w;
+        rotq.classList.remove('swap');
+      }, 460);
+    }, 6200);
+  }
 
   /* ---- current year ---- */
   document.querySelectorAll('[data-year]').forEach(function (el) {
