@@ -296,7 +296,9 @@ body.menu-open .drawer{opacity:1;visibility:visible;transform:none}
 /* ---------- about ---------- */
 .split{display:grid;gap:34px;grid-template-columns:1fr;align-items:center}
 .figure{position:relative;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-soft)}
-.figure img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;filter:saturate(.82) contrast(1.06)}
+.figure img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;display:block;filter:saturate(.82) contrast(1.06)}
+/* height:auto is load-bearing: without it the img height attribute pins the box
+   and defeats aspect-ratio, cropping a 4:3 photo into a portrait sliver. */
 .figure__tag{
   position:absolute;left:0;bottom:0;background:var(--clay);color:#FFF3EC;
   padding:11px 18px;border-radius:0 var(--r) 0 0;
