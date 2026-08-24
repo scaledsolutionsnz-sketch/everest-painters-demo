@@ -1,20 +1,29 @@
 /* ==========================================================================
    Everest Painters — Wānaka / Lake Hāwea
-   Archetype: Crafted  ·  Type: Young Serif + Epilogue
+   Archetype: Crafted  ·  Type: Bricolage Grotesque + Epilogue
    ========================================================================== */
 
 :root{
-  --ink:#1E1815;
-  --ink-2:#2C231D;
-  --ink-soft:#4A3C33;
-  --body:#524740;
-  --bone:#F8F3EB;
-  --bone-2:#EFE6D9;
-  --line:#DFD4C3;
-  --white:#FFFDF9;
+  /* Schist ground, cool near-black, one warm accent.
+     Deliberately NOT the cream + brass + espresso default: the ground is
+     cool stone so the colour on this page comes from the paintwork. */
+  --ink:#15181A;
+  --ink-2:#1E2225;
+  --ink-soft:#3D4448;
+  --body:#4B5358;
+  --bone:#F0F1EF;
+  --bone-2:#E3E6E2;
+  --line:#CFD4CF;
+  --white:#FFFFFF;
   --clay:#B2542B;
-  --clay-2:#933F1D;
-  --clay-soft:#F3E2D7;
+  --clay-2:#8F401C;
+  --clay-soft:#F0DED3;
+  /* fan deck: pulled from finishes the crew actually rolled on */
+  --sw-olive:#5D6544;
+  --sw-duck:#9CBCC2;
+  --sw-navy:#22343F;
+  --sw-ochre:#C9922F;
+  --sw-clay:#B2542B;
   --r:12px;
   --r-lg:16px;
   --shadow:0 18px 44px -26px rgba(30,24,21,.42);
@@ -42,7 +51,7 @@ body{
 img{max-width:100%;image-orientation:from-image}
 
 h1,h2,h3,h4{
-  font-family:'Young Serif',Georgia,'Times New Roman',serif;
+  font-family:'Bricolage Grotesque',-apple-system,'Segoe UI',sans-serif;
   font-weight:400;
   color:var(--ink);
   line-height:1.1;
@@ -60,7 +69,7 @@ a{color:inherit}
 .eyebrow{
   display:inline-flex;align-items:center;gap:9px;
   font-size:.72rem;font-weight:600;letter-spacing:.19em;text-transform:uppercase;
-  color:var(--clay);margin:0 0 18px;
+  color:var(--clay-2);margin:0 0 18px;
 }
 .eyebrow::before{content:"";width:26px;height:1px;background:var(--clay);opacity:.55;flex:none}
 
@@ -84,7 +93,7 @@ a{color:inherit}
   transition:transform .3s var(--ease),background .3s var(--ease),color .3s var(--ease),box-shadow .3s var(--ease);
 }
 .btn svg{width:18px;height:18px;flex:none}
-.btn--clay{background:var(--clay);color:#FFF6F1;box-shadow:0 12px 26px -16px rgba(147,63,29,.85)}
+.btn--clay{background:var(--clay);color:#FFF6F1;box-shadow:0 12px 26px -16px rgba(21,24,26,.55)}
 .btn--clay:hover{background:var(--clay-2);transform:translateY(-2px)}
 .btn--ink{background:var(--ink);color:var(--bone)}
 .btn--ink:hover{background:#0F0B09;transform:translateY(-2px)}
@@ -101,7 +110,7 @@ a{color:inherit}
   transition:opacity .7s var(--ease),visibility .7s var(--ease);
 }
 #intro .mark{
-  font-family:'Young Serif',serif;color:var(--bone);font-size:clamp(1.5rem,6vw,2.4rem);
+  font-family:'Bricolage Grotesque',-apple-system,'Segoe UI',sans-serif;color:var(--bone);font-size:clamp(1.5rem,6vw,2.4rem);
   letter-spacing:.02em;text-align:center;line-height:1.25;
   opacity:0;transform:translateY(14px);animation:introIn 1.05s var(--ease) forwards;
 }
@@ -129,10 +138,10 @@ body.intro-done #intro{opacity:0;visibility:hidden}
 }
 .brand__mark svg{width:21px;height:21px;color:#FFF3EC}
 .brand__txt{display:flex;flex-direction:column;line-height:1.05}
-.brand__name{font-family:'Young Serif',serif;font-size:1.06rem;color:#fff;letter-spacing:.01em}
-.brand__sub{font-size:.6rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.62);margin-top:3px}
+.brand__name{font-family:'Bricolage Grotesque',-apple-system,'Segoe UI',sans-serif;font-size:1.06rem;color:#fff;letter-spacing:.01em}
+.brand__sub{font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.62);margin-top:3px}
 .nav--solid .brand__name{color:var(--ink)}
-.nav--solid .brand__sub{color:var(--clay)}
+.nav--solid .brand__sub{color:var(--clay-2)}
 
 .nav__links{display:none}
 .nav__links a{
@@ -175,7 +184,7 @@ body.menu-open .burger span:nth-child(3){transform:translateY(-6.6px) rotate(-45
 }
 body.menu-open .drawer{opacity:1;visibility:visible;transform:none}
 .drawer a{
-  color:#EFE6D9;text-decoration:none;font-family:'Young Serif',serif;font-size:1.5rem;
+  color:#EFE6D9;text-decoration:none;font-family:'Bricolage Grotesque',-apple-system,'Segoe UI',sans-serif;font-size:1.5rem;
   padding:14px 2px;border-bottom:1px solid rgba(255,255,255,.09);
 }
 .drawer .drawer__btns{margin-top:22px;display:grid;gap:12px}
@@ -238,6 +247,26 @@ body.menu-open .drawer{opacity:1;visibility:visible;transform:none}
 .trust__item p{margin:0;font-size:.92rem;color:rgba(216,205,194,.86);line-height:1.55}
 
 /* ---------- services ---------- */
+/* --- fan deck: the signature motif, chips taken from finishes the crew rolled on --- */
+.fandeck{display:flex;gap:5px;align-items:flex-end;margin:0 0 20px;padding:0;list-style:none}
+.fandeck li{width:26px;height:12px;border-radius:2px;background:var(--c);transform-origin:bottom left}
+.fandeck li:nth-child(1){--c:var(--sw-navy);height:20px}
+.fandeck li:nth-child(2){--c:var(--sw-olive);height:16px}
+.fandeck li:nth-child(3){--c:var(--sw-duck);height:12px}
+.fandeck li:nth-child(4){--c:var(--sw-ochre);height:16px}
+.fandeck li:nth-child(5){--c:var(--sw-clay);height:20px}
+.fandeck--hero li{height:24px;width:34px;box-shadow:0 2px 10px rgba(0,0,0,.28)}
+.fandeck--hero li:nth-child(2){height:19px}
+.fandeck--hero li:nth-child(3){height:15px}
+.fandeck--hero li:nth-child(4){height:19px}
+.footer__deck{display:flex;gap:0;list-style:none;margin:0;padding:0}
+.footer__deck li{flex:1;height:5px;background:var(--c)}
+.footer__deck li:nth-child(1){--c:var(--sw-navy)}
+.footer__deck li:nth-child(2){--c:var(--sw-olive)}
+.footer__deck li:nth-child(3){--c:var(--sw-duck)}
+.footer__deck li:nth-child(4){--c:var(--sw-ochre)}
+.footer__deck li:nth-child(5){--c:var(--sw-clay)}
+
 .sec-head{max-width:none;margin-bottom:52px}
 .sec-head h2{margin-bottom:.35em}
 .sec-head .lede{max-width:56ch}
@@ -288,11 +317,11 @@ body.menu-open .drawer{opacity:1;visibility:visible;transform:none}
 .avatar{
   width:72px;height:72px;margin:0 auto 16px;border-radius:50%;
   background:var(--ink);color:#F6E7DC;display:flex;align-items:center;justify-content:center;
-  font-family:'Young Serif',serif;font-size:1.3rem;letter-spacing:.03em;
+  font-family:'Bricolage Grotesque',-apple-system,'Segoe UI',sans-serif;font-size:1.3rem;letter-spacing:.03em;
   box-shadow:0 0 0 3px var(--bone),0 0 0 4px var(--clay);
 }
 .crew__card h3{margin:0 0 4px;font-size:1.16rem}
-.crew__role{font-size:.72rem;font-weight:600;letter-spacing:.17em;text-transform:uppercase;color:var(--clay);margin:0 0 12px}
+.crew__role{font-size:.72rem;font-weight:600;letter-spacing:.17em;text-transform:uppercase;color:var(--clay-2);margin:0 0 12px}
 .crew__card p{margin:0;font-size:.93rem}
 
 .badge{
@@ -370,16 +399,17 @@ body.menu-open .drawer{opacity:1;visibility:visible;transform:none}
 .map__frame iframe{width:100%;height:340px;border:0;display:block;filter:grayscale(.22) contrast(1.03)}
 
 /* ---------- footer ---------- */
-.footer{background:#171210;color:rgba(216,205,194,.72);padding:52px 0 34px;font-size:.93rem}
+.footer{background:#15181A;color:rgba(214,219,222,.72);padding:0 0 34px;font-size:.93rem}
+.footer__deck{margin-bottom:52px}
 .footer__top{display:grid;gap:28px;padding-bottom:28px;border-bottom:1px solid rgba(255,255,255,.09)}
 .footer .brand__name{color:#fff}
-.footer p{font-size:.92rem;margin:14px 0 0;max-width:44ch;color:rgba(216,205,194,.66)}
+.footer p{font-size:.92rem;margin:14px 0 0;max-width:44ch;color:rgba(214,219,222,.66)}
 .footer__nav{display:grid;gap:10px}
 .footer__nav h4{font-family:'Epilogue',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#fff;margin:0 0 6px}
-.footer__nav a{color:rgba(216,205,194,.72);text-decoration:none;transition:color .25s var(--ease)}
+.footer__nav a{color:rgba(214,219,222,.72);text-decoration:none;transition:color .25s var(--ease)}
 .footer__nav a:hover{color:#E5A87F}
-.footer__bot{padding-top:22px;display:flex;flex-direction:column;gap:14px;font-size:.85rem;color:rgba(216,205,194,.55)}
-.footer__bot a{color:rgba(216,205,194,.66);text-decoration:none}
+.footer__bot{padding-top:22px;display:flex;flex-direction:column;gap:14px;font-size:.85rem;color:rgba(214,219,222,.55)}
+.footer__bot a{color:rgba(214,219,222,.66);text-decoration:none}
 .footer__bot a:hover{color:#E5A87F}
 .footer .socials{margin-top:4px}
 .footer .socials a{width:42px;height:42px}
@@ -456,7 +486,7 @@ body.menu-open .drawer{opacity:1;visibility:visible;transform:none}
 /* ---------- rotating hero review ---------- */
 .rotq{margin-top:16px;max-width:600px;background:rgba(30,24,21,.55);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:16px 20px;color:#fff}
 .rotq__text{margin:0 0 8px;font-size:.96rem;line-height:1.55;color:rgba(255,255,255,.94);transition:opacity .45s ease}
-.rotq__who{font-size:.78rem;letter-spacing:.06em;color:#E7A66C;transition:opacity .45s ease}
+.rotq__who{font-size:.78rem;letter-spacing:.02em;color:#E7A66C;transition:opacity .45s ease}
 .rotq.swap .rotq__text,.rotq.swap .rotq__who{opacity:0}
 @media(min-width:760px){.rotq__text{min-height:3.1em}}
 
@@ -465,7 +495,7 @@ body.menu-open .drawer{opacity:1;visibility:visible;transform:none}
 .cbox__map{line-height:0;min-height:100%}
 .cbox__map iframe{width:100%;height:100%;min-height:560px;border:0;display:block;filter:saturate(.88)}
 .cbox__panel{padding:38px 34px}
-.cbox__panel h3{font-family:'Young Serif',serif;font-size:1.35rem;color:#fff;margin:0 0 8px}
+.cbox__panel h3{font-family:'Bricolage Grotesque',-apple-system,'Segoe UI',sans-serif;font-size:1.35rem;color:#fff;margin:0 0 8px}
 .cbox__panel>p{color:rgba(216,205,194,.86);font-size:.94rem;margin:0 0 20px}
 .cbox__panel .btn{width:100%;margin-bottom:12px}
 .cbox__panel .infolist{margin-top:18px}
