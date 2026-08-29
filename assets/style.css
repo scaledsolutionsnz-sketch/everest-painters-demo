@@ -12,6 +12,7 @@
   --ink-soft:#3D4448;
   --body:#4B5358;
   --bone:#F0F1EF;
+  --plaster-base:#E9EBE8;
   --bone-2:#E3E6E2;
   --line:#CFD4CF;
   --white:#FFFFFF;
@@ -38,7 +39,15 @@ html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 
 body{
   margin:0;
-  background:var(--bone);
+  background-color:var(--plaster-base);
+  background-image:
+    radial-gradient(58% 42% at 12% 8%, rgba(255,255,255,.85) 0%, rgba(255,255,255,0) 62%),
+    radial-gradient(46% 38% at 82% 22%, rgba(214,217,214,.55) 0%, rgba(214,217,214,0) 66%),
+    radial-gradient(66% 48% at 68% 74%, rgba(255,255,255,.7) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(40% 34% at 24% 62%, rgba(205,209,206,.5) 0%, rgba(205,209,206,0) 64%),
+    linear-gradient(168deg, rgba(233,235,232,.9) 0%, rgba(222,225,222,.55) 46%, rgba(238,239,236,.9) 100%);
+  background-attachment:fixed;
+  background-size:cover;
   color:var(--body);
   font-family:'Epilogue',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   font-size:17px;
@@ -74,8 +83,8 @@ a{color:inherit}
 .eyebrow::before{content:"";width:26px;height:1px;background:var(--clay);opacity:.55;flex:none}
 
 .section{padding:76px 0}
-.section--bone{background:var(--bone)}
-.section--bone2{background:var(--bone-2)}
+.section--bone{background:rgba(255,255,255,.34)}
+.section--bone2{background:rgba(210,214,210,.30)}
 .section--dark{background:var(--ink);color:#D8CDC2}
 /* every dark band gets light headings */
 .section--dark h2,.section--dark h3,
@@ -552,3 +561,31 @@ body.menu-open .drawer{opacity:1;visibility:visible;transform:none}
     animation:none;opacity:1;transform:none;
   }
 }
+
+/* Venetian plaster grain. Fixed and pointer-events:none so it never repaints on scroll. */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='420' height='420' filter='url(%23p)' opacity='0.34'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;
+}
+body > *{position:relative;z-index:1}
+
+/* commissioned artwork card: no photo exists yet, so the panel carries the mark */
+.card--art .card__img--art{
+  display:grid;place-items:center;aspect-ratio:4/3;
+  background:linear-gradient(150deg,#EFE3DA 0%,#E4D2C4 100%);color:var(--clay-2);
+}
+.card--art .card__img--art svg{width:74px;height:74px}
+
+/* before photographs */
+.beforegrid{display:grid;grid-template-columns:1fr;gap:20px}
+.ba{position:relative;margin:0;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);background:var(--white)}
+.ba img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;filter:saturate(.82) contrast(1.06)}
+.ba__tag{
+  position:absolute;top:14px;left:14px;z-index:2;
+  background:var(--ink);color:var(--bone);border-radius:999px;
+  padding:0 14px;height:30px;display:inline-flex;align-items:center;line-height:1;
+  font-size:.76rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+}
+.ba figcaption{padding:14px 18px 18px;font-size:.93rem;color:var(--body)}
+@media (min-width:760px){ .beforegrid{grid-template-columns:1fr 1fr;gap:22px} }
