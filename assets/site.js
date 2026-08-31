@@ -39,15 +39,33 @@
     window.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
   }
 
+  /* Run an interval only while `el` is on screen and the tab is visible. The
+     hero crossfade and the quote rotator used to tick forever, compositing
+     full-bleed images long after they had scrolled away. */
+  function whileVisible(el, ms, tick) {
+    var id = null;
+    var onScreen = true;
+    function start() { if (id === null && onScreen && !document.hidden) id = setInterval(tick, ms); }
+    function stop() { if (id !== null) { clearInterval(id); id = null; } }
+    if ('IntersectionObserver' in window && el) {
+      new IntersectionObserver(function (es) {
+        onScreen = es[0].isIntersecting;
+        onScreen ? start() : stop();
+      }, { threshold: 0 }).observe(el);
+    }
+    document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+    start();
+  }
+
   /* ---- hero crossfade (paused under reduced motion) ---- */
   var slides = document.querySelectorAll('.hero__slide');
   if (slides.length > 1 && !reduce) {
     var i = 0;
-    setInterval(function () {
+    whileVisible(slides[0].parentNode || slides[0], 5600, function () {
       slides[i].classList.remove('on');
       i = (i + 1) % slides.length;
       slides[i].classList.add('on');
-    }, 5600);
+    });
   }
 
   /* ---- scroll reveals ---- */
@@ -64,14 +82,30 @@
 
     /* backstop: anything sitting in (or above) the viewport is shown even if the
        observer missed it after a lazy-image layout shift — nothing stays invisible */
+    /* Throttled to one rAF per frame and self-unbinding: reading
+       getBoundingClientRect on every item on every scroll event forced a
+       synchronous layout each frame, which is what made scrolling stutter. */
+    var pending = false;
+    var pool = items.slice ? items.slice() : Array.prototype.slice.call(items);
+    var onScroll;
     var sweep = function () {
+      pending = false;
       var h = window.innerHeight || 800;
-      items.forEach(function (el) {
-        if (el.classList.contains('in')) return;
-        if (el.getBoundingClientRect().top < h * 0.94) el.classList.add('in');
-      });
+      for (var i = pool.length - 1; i >= 0; i--) {
+        var el = pool[i];
+        if (el.classList.contains('in') || el.getBoundingClientRect().top < h * 0.94) {
+          el.classList.add('in');
+          pool.splice(i, 1);
+        }
+      }
+      if (!pool.length && onScroll) window.removeEventListener('scroll', onScroll);
     };
-    window.addEventListener('scroll', sweep, { passive: true });
+    onScroll = function () {
+      if (pending) return;
+      pending = true;
+      window.requestAnimationFrame(sweep);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('load', function () { setTimeout(sweep, 400); });
     setTimeout(sweep, 1400);
   }
@@ -98,7 +132,7 @@
     var qt = document.getElementById('rotqText');
     var qw = document.getElementById('rotqWho');
     var qi = 0;
-    setInterval(function () {
+    whileVisible(rotq, 6200, function () {
       rotq.classList.add('swap');
       setTimeout(function () {
         qi = (qi + 1) % quotes.length;
@@ -106,7 +140,7 @@
         qw.textContent = quotes[qi].w;
         rotq.classList.remove('swap');
       }, 460);
-    }, 6200);
+    });
   }
 
   /* ---- current year ---- */

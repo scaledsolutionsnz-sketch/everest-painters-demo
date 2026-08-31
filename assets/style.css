@@ -171,7 +171,7 @@ body.intro-done #intro{opacity:0;visibility:hidden}
 .nav__call:hover{background:var(--clay-2);transform:translateY(-1px)}
 .nav__call .lbl{display:none}
 
-.nav--solid{background:rgba(248,243,235,.95);backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--line)}
+.nav--solid{background:rgb(249,245,238);box-shadow:0 1px 0 var(--line)}
 
 .burger{
   width:46px;height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.32);
