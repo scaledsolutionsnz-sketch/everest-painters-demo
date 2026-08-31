@@ -578,9 +578,9 @@ body > *{position:relative;z-index:1}
 .card--art .card__img--art svg{width:74px;height:74px}
 
 /* before photographs */
-.beforegrid{display:grid;grid-template-columns:1fr;gap:20px}
+.beforegrid{display:grid;grid-template-columns:1fr;gap:20px;align-items:start}
 .ba{position:relative;margin:0;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);background:var(--white)}
-.ba img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;filter:saturate(.82) contrast(1.06)}
+.ba img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;display:block;filter:saturate(.82) contrast(1.06)}
 .ba__tag{
   position:absolute;top:14px;left:14px;z-index:2;
   background:var(--ink);color:var(--bone);border-radius:999px;
