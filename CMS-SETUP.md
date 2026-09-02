@@ -10,16 +10,11 @@ site immediately — there is no rebuild and no deploy.
 
 ### 1. Create the database table and image bucket
 
-The SQL lives in the Principal Synergy repo, because that is the repo that
-tracks migrations for this Supabase project:
+Supabase dashboard → project **`bffddgypusotsdwpaliy`** → **SQL Editor** →
+**New query** → paste the whole of [`supabase/schema.sql`](supabase/schema.sql)
+→ **Run**.
 
-    principal-synergy/supabase/migrations/0047_everest_site_cms.sql
-
-Supabase dashboard → **SQL Editor** → **New query** → paste that file → **Run**.
-(Already applied to production on 2026-09-03.)
-
-This creates, in the **Principal Synergy** project (`okwjuvhjrwidhqtzeguv`),
-alongside the CRM but entirely separate from it:
+This creates:
 
 | What | Where | Who can read | Who can write |
 |---|---|---|---|
@@ -27,10 +22,8 @@ alongside the CRM but entirely separate from it:
 | `everest-site-images` bucket | Storage | anyone | listed Everest editors only |
 | `everest_site_editors` table | Database | nobody from the browser | SQL editor only |
 
-It does **not** touch `public.site_content` — that table is the Principal
-Synergy marketing site's, has a different shape, and is gated by a different
-role. Keeping them apart is what stops an Everest login from reaching CRM
-content, and a CRM editor from reaching Everest's.
+Everything is prefixed `everest_` / `everest-` so it cannot collide with
+anything else in the project.
 
 Row level security is on throughout, so the publishable key in the browser can
 only ever read.
