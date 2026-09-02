@@ -72,6 +72,18 @@ create trigger everest_site_content_touch
 
 alter table public.everest_site_content enable row level security;
 
+-- Table privileges. RLS decides WHICH rows; these decide whether the role may
+-- touch the table at all. Without them PostgREST returns 42501 "permission
+-- denied for table" before any policy is consulted. Not inherited from
+-- default privileges in newer projects, so they are granted explicitly.
+grant usage on schema public to anon, authenticated;
+grant select on public.everest_site_content to anon, authenticated;
+grant insert, update, delete on public.everest_site_content to authenticated;
+
+-- everest_site_editors deliberately gets no grants: it is only ever read
+-- through is_everest_editor(), which is security definer and so runs as the
+-- table owner. No browser role can read the allowlist directly.
+
 -- Anyone may read: this is public website copy.
 drop policy if exists "everest_site_content read" on public.everest_site_content;
 create policy "everest_site_content read"

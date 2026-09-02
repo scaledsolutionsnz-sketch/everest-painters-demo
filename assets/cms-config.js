@@ -10,6 +10,6 @@
    Do NOT put the service_role key here. */
 window.CMS_CONFIG = {
   url: 'https://bffddgypusotsdwpaliy.supabase.co',
-  anonKey: 'PASTE_PUBLISHABLE_KEY_HERE',
+  anonKey: 'sb_publishable_p1PXdYSrDVuqopFeO0HWTA_CG7-l-WV',
   bucket: 'everest-site-images'
 };
