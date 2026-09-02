@@ -10,8 +10,13 @@ site immediately — there is no rebuild and no deploy.
 
 ### 1. Create the database table and image bucket
 
-Supabase dashboard → **SQL Editor** → **New query** → paste the whole of
-[`supabase/schema.sql`](supabase/schema.sql) → **Run**.
+The SQL lives in the Principal Synergy repo, because that is the repo that
+tracks migrations for this Supabase project:
+
+    principal-synergy/supabase/migrations/0047_everest_site_cms.sql
+
+Supabase dashboard → **SQL Editor** → **New query** → paste that file → **Run**.
+(Already applied to production on 2026-09-03.)
 
 This creates, in the **Principal Synergy** project (`okwjuvhjrwidhqtzeguv`),
 alongside the CRM but entirely separate from it:
