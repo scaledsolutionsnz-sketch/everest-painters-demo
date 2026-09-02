@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Sign in · Artifex Decor</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Epilogue:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#15181A; --ink-soft:#3D4448; --body:#4B5358;
+  --bone:#F0F1EF; --line:#CFD4CF; --white:#fff;
+  --clay:#B2542B; --clay-2:#8F401C;
+  --r:12px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;min-height:100svh;display:grid;place-items:center;padding:24px;
+  font-family:'Epilogue',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--body);background:var(--bone);
+  -webkit-font-smoothing:antialiased;
+}
+.card{
+  width:100%;max-width:400px;background:var(--white);border:1px solid var(--line);
+  border-radius:16px;padding:34px 32px 28px;
+  box-shadow:0 18px 44px -26px rgba(30,24,21,.42);
+}
+.brand{
+  font-family:'Bricolage Grotesque',-apple-system,'Segoe UI',sans-serif;
+  font-weight:700;font-size:1.3rem;color:var(--ink);letter-spacing:-.01em;margin:0 0 2px;
+}
+.brand span{color:var(--clay)}
+.sub{font-size:.92rem;margin:0 0 24px;color:var(--body)}
+label{display:block;font-size:.74rem;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px}
+input{
+  width:100%;border:1px solid var(--line);border-radius:var(--r);
+  padding:12px 14px;font:400 1rem/1.4 inherit;color:var(--ink);background:var(--white);
+  transition:border-color .18s var(--ease),box-shadow .18s var(--ease);
+}
+input:focus{outline:0;border-color:var(--clay);box-shadow:0 0 0 3px rgba(178,84,43,.14)}
+.field{margin-bottom:16px}
+button{
+  width:100%;border:0;border-radius:var(--r);padding:13px 18px;cursor:pointer;
+  font:600 .98rem/1 inherit;background:var(--clay);color:#fff;
+  transition:background .18s var(--ease),transform .18s var(--ease);
+}
+button:hover{background:var(--clay-2)}
+button:active{transform:translateY(1px)}
+button[disabled]{opacity:.55;cursor:default;transform:none}
+.msg{
+  margin:16px 0 0;padding:11px 13px;border-radius:10px;font-size:.88rem;display:none;
+}
+.msg.err{display:block;background:#FBEDE6;color:#8F401C;border:1px solid #E7CBBC}
+.msg.ok{display:block;background:#EDF1E9;color:#4C5638;border:1px solid #CFD9C4}
+.foot{margin:22px 0 0;font-size:.8rem;color:#8A9296;text-align:center}
+.foot a{color:#8A9296}
+.setup{
+  margin:18px 0 0;padding:13px 15px;border-radius:10px;background:#FBEDE6;
+  border:1px solid #E7CBBC;color:#8F401C;font-size:.85rem;line-height:1.55;display:none;
+}
+.setup code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
+</style>
+</head>
+<body>
+
+<main class="card">
+  <h1 class="brand">Artifex <span>Decor</span></h1>
+  <p class="sub">Sign in to edit the website.</p>
+
+  <form id="form" autocomplete="on">
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" autocomplete="username" required>
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+    </div>
+    <button type="submit" id="go">Sign in</button>
+  </form>
+
+  <p class="msg" id="msg"></p>
+  <div class="setup" id="setup">
+    <strong>Not configured yet.</strong> Paste your Supabase anon key into
+    <code>assets/cms-config.js</code>, then run <code>supabase/schema.sql</code>
+    in the Supabase SQL editor.
+  </div>
+
+  <p class="foot"><a href="index.html">← Back to the website</a></p>
+</main>
+
+<script src="assets/cms-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function () {
+  var CFG = window.CMS_CONFIG || {};
+  var form = document.getElementById('form');
+  var msg = document.getElementById('msg');
+  var go = document.getElementById('go');
+
+  function show(text, kind) {
+    msg.textContent = text;
+    msg.className = 'msg ' + kind;
+  }
+
+  if (!CFG.url || !CFG.anonKey || /PASTE_YOUR/.test(CFG.anonKey)) {
+    document.getElementById('setup').style.display = 'block';
+    go.disabled = true;
+    return;
+  }
+
+  var sb = window.supabase.createClient(CFG.url, CFG.anonKey);
+
+  function nextUrl() {
+    var q = new URLSearchParams(location.search).get('next');
+    if (q && /^[a-z0-9._-]+\.html/i.test(q.replace(/^\//, ''))) return q;
+    return 'index.html?cms=edit';
+  }
+
+  // Already signed in? Go straight through.
+  sb.auth.getSession().then(function (res) {
+    if (res.data && res.data.session) location.replace(nextUrl());
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    go.disabled = true;
+    go.textContent = 'Signing in…';
+    sb.auth.signInWithPassword({
+      email: document.getElementById('email').value.trim(),
+      password: document.getElementById('password').value
+    }).then(function (res) {
+      if (res.error) throw res.error;
+      show('Signed in. Opening the editor…', 'ok');
+      location.replace(nextUrl());
+    }).catch(function (err) {
+      show(err.message || 'Could not sign in.', 'err');
+      go.disabled = false;
+      go.textContent = 'Sign in';
+    });
+  });
+})();
+</script>
+</body>
+</html>
