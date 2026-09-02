@@ -1,7 +1,7 @@
 /* ==========================================================================
    Artifex Decor — content overlay + in-place editor
    --------------------------------------------------------------------------
-   View mode  (every visitor): reads site_content from Supabase over plain
+   View mode  (every visitor): reads everest_site_content from Supabase over plain
                                REST and applies it to [data-cms] elements.
                                No dependencies, ~2KB of work.
    Edit mode  (?cms=edit + a signed-in session): loads supabase-js, adds the
@@ -16,7 +16,7 @@
   'use strict';
 
   var CFG = window.CMS_CONFIG || {};
-  var TABLE = 'site_content';
+  var TABLE = 'everest_site_content';
   var CACHE_KEY = 'artifex.cms.v1';
   var SDK = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
 
@@ -561,11 +561,11 @@
     var name = el.getAttribute('data-cms').replace(/[^a-z0-9._-]/gi, '_') +
       '-' + Date.now() + '.' + ext;
     drop.textContent = 'Uploading…';
-    sb.storage.from(CFG.bucket || 'site-images')
+    sb.storage.from(CFG.bucket || 'everest-site-images')
       .upload(name, file, { cacheControl: '31536000', upsert: false })
       .then(function (res) {
         if (res.error) throw res.error;
-        var url = sb.storage.from(CFG.bucket || 'site-images').getPublicUrl(name).data.publicUrl;
+        var url = sb.storage.from(CFG.bucket || 'everest-site-images').getPublicUrl(name).data.publicUrl;
         var next = currentRecord(el);
         next.src = url;
         applyOne(el, next);

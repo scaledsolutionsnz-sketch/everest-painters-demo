@@ -1,10 +1,15 @@
-/* Artifex Decor CMS — public configuration.
-   The anon key is a public, publishable key. It is safe in the browser: what
-   it can actually do is fixed by the row level security policies in
-   supabase/schema.sql (anyone may read site_content, only a signed-in admin
-   may write it). Do NOT put the service_role key here. */
+/* Everest Painters CMS — public configuration.
+
+   This points at the Principal Synergy Supabase project, which also holds the
+   CRM. Everest's content lives in its own table (everest_site_content) and its
+   own bucket (everest-site-images); see supabase/schema.sql.
+
+   The key below is a publishable key. It is safe in the browser: what it can
+   actually do is fixed by row level security — anyone may read the content,
+   only a user listed in everest_site_editors may write it.
+   Do NOT put the service_role key here. */
 window.CMS_CONFIG = {
   url: 'https://okwjuvhjrwidhqtzeguv.supabase.co',
-  anonKey: 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE',
-  bucket: 'site-images'
+  anonKey: 'PASTE_PUBLISHABLE_KEY_HERE',
+  bucket: 'everest-site-images'
 };

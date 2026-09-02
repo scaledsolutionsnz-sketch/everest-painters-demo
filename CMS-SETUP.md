@@ -1,4 +1,4 @@
-# Artifex Decor — website admin
+# Everest Painters — website admin
 
 An admin login at `/admin.html` that lets you change **any text and any image**
 on the site without touching code. Edits save to Supabase and appear on the live
@@ -13,25 +13,32 @@ site immediately — there is no rebuild and no deploy.
 Supabase dashboard → **SQL Editor** → **New query** → paste the whole of
 [`supabase/schema.sql`](supabase/schema.sql) → **Run**.
 
-This creates:
+This creates, in the **Principal Synergy** project (`okwjuvhjrwidhqtzeguv`),
+alongside the CRM but entirely separate from it:
 
 | What | Where | Who can read | Who can write |
 |---|---|---|---|
-| `site_content` table | Database | anyone (it is public website copy) | signed-in admins only |
-| `site-images` bucket | Storage | anyone | signed-in admins only |
+| `everest_site_content` table | Database | anyone (it is public website copy) | listed Everest editors only |
+| `everest-site-images` bucket | Storage | anyone | listed Everest editors only |
+| `everest_site_editors` table | Database | nobody from the browser | SQL editor only |
 
-Row level security is on for both, so the public key in the browser can only
-ever read.
+It does **not** touch `public.site_content` — that table is the Principal
+Synergy marketing site's, has a different shape, and is gated by a different
+role. Keeping them apart is what stops an Everest login from reaching CRM
+content, and a CRM editor from reaching Everest's.
 
-### 2. Paste the anon key
+Row level security is on throughout, so the publishable key in the browser can
+only ever read.
 
-Supabase dashboard → **Project Settings → API** → copy the **anon / public** key
-(the long one starting `eyJ...`, *not* `service_role`).
+### 2. Paste the publishable key
+
+Supabase dashboard → **Project Settings → API Keys** → copy the **publishable**
+key (starts `sb_publishable_...`), *not* `service_role`.
 
 Open `assets/cms-config.js` and replace the placeholder:
 
 ```js
-anonKey: 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE',
+anonKey: 'PASTE_PUBLISHABLE_KEY_HERE',
 ```
 
 This key is meant to be public — it is what the RLS policies above are for.
@@ -39,12 +46,30 @@ This key is meant to be public — it is what the RLS policies above are for.
 
 ### 3. Create the admin login
 
-Supabase dashboard → **Authentication → Users → Add user**:
+Supabase dashboard → **Authentication → Users → Add user → Create new user**:
 
 - Email: whoever should be able to edit the site
-- Password: set one, and tick **Auto confirm user**
+- Password: set one
+- Tick **Auto Confirm User** — without it the login fails silently
 
-Repeat for each person who needs access. To remove someone, delete their user.
+### 4. Grant that user editing rights
+
+Creating the account is not enough on its own; a Supabase user with no entry in
+`everest_site_editors` can read the site but cannot save anything. In the **SQL
+Editor**, with their email:
+
+```sql
+insert into public.everest_site_editors (user_id)
+select id from auth.users where email = 'you@example.com'
+on conflict (user_id) do nothing;
+```
+
+Repeat per person. To revoke access without deleting the account:
+
+```sql
+delete from public.everest_site_editors
+where user_id = (select id from auth.users where email = 'you@example.com');
+```
 
 Then commit and push — Vercel redeploys automatically.
 
@@ -79,7 +104,7 @@ Every editable element in the HTML carries a stable key:
 <img data-cms="index.services.img_3" data-cms-type="image" src="img/work-kitchen-pendants.jpg" ...>
 ```
 
-`assets/cms.js` reads `site_content` and applies any row whose key matches.
+`assets/cms.js` reads `everest_site_content` and applies any row whose key matches.
 The HTML in the repo is always the fallback: if Supabase is unreachable, if the
 key is missing, or if a row is deleted, the page shows exactly what it shows
 today. Nothing can white-screen the site.

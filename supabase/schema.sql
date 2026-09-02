@@ -1,11 +1,47 @@
 -- ===========================================================================
--- Artifex Decor website CMS
--- Run once in the Supabase SQL editor (Dashboard → SQL Editor → New query).
--- Safe to re-run.
+-- Everest Painters website CMS
+--
+-- Lives in the Principal Synergy Supabase project (okwjuvhjrwidhqtzeguv),
+-- alongside the CRM, but in its OWN table and bucket.
+--
+-- It deliberately does NOT reuse public.site_content: that table belongs to
+-- the Principal Synergy marketing site, has a different shape, and its writes
+-- are gated by public.is_content_editor(). Sharing either the table or that
+-- role would let Everest's login edit Principal Synergy content, and let
+-- Principal Synergy editors edit Everest's site. Neither is wanted.
+--
+-- Run once in the Supabase SQL editor. Safe to re-run. Creates nothing that
+-- already exists and alters no existing object.
 -- ===========================================================================
 
+-- ------------------------------------------------------------------ editors
+-- Who may edit the Everest site. Membership here is the ONLY thing that
+-- grants write access — being a CRM user, or even a CRM admin, is not enough.
+create table if not exists public.everest_site_editors (
+  user_id    uuid primary key references auth.users (id) on delete cascade,
+  added_at   timestamptz not null default now()
+);
+
+alter table public.everest_site_editors enable row level security;
+
+-- Deliberately no policies: the table is readable and writable only by the
+-- service role and the SQL editor. Nobody manages this list from the browser.
+
+create or replace function public.is_everest_editor()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.everest_site_editors
+    where user_id = auth.uid()
+  );
+$$;
+
 -- ------------------------------------------------------------------ content
-create table if not exists public.site_content (
+create table if not exists public.everest_site_content (
   key         text primary key,
   data        jsonb       not null default '{}'::jsonb,
   type        text        not null default 'text',
@@ -13,11 +49,12 @@ create table if not exists public.site_content (
   updated_by  uuid        references auth.users (id) on delete set null
 );
 
-comment on table public.site_content is
-  'One row per editable element on the website. key matches the data-cms '
-  'attribute in the HTML; data holds {v, href} for text or {src, alt} for images.';
+comment on table public.everest_site_content is
+  'One row per editable element on everestpainters.co.nz. key matches the '
+  'data-cms attribute in the HTML; data holds {v, href} for text or '
+  '{src, alt} for images. Unrelated to public.site_content (Principal Synergy).';
 
-create or replace function public.site_content_touch()
+create or replace function public.everest_site_content_touch()
 returns trigger
 language plpgsql
 security definer
@@ -30,58 +67,87 @@ begin
 end;
 $$;
 
-drop trigger if exists site_content_touch on public.site_content;
-create trigger site_content_touch
-  before insert or update on public.site_content
-  for each row execute function public.site_content_touch();
+drop trigger if exists everest_site_content_touch on public.everest_site_content;
+create trigger everest_site_content_touch
+  before insert or update on public.everest_site_content
+  for each row execute function public.everest_site_content_touch();
 
-alter table public.site_content enable row level security;
+alter table public.everest_site_content enable row level security;
 
--- Anyone (including anonymous visitors) may read: this is public website copy.
-drop policy if exists "site_content read" on public.site_content;
-create policy "site_content read"
-  on public.site_content for select
+-- Anyone may read: this is public website copy.
+drop policy if exists "everest_site_content read" on public.everest_site_content;
+create policy "everest_site_content read"
+  on public.everest_site_content for select
   using (true);
 
--- Only a signed-in admin may change it.
-drop policy if exists "site_content write" on public.site_content;
-create policy "site_content write"
-  on public.site_content for all
+-- Only a listed Everest editor may write. Note this is scoped per-command
+-- rather than `for all`, so a missing WITH CHECK cannot widen anything.
+drop policy if exists "everest_site_content insert" on public.everest_site_content;
+create policy "everest_site_content insert"
+  on public.everest_site_content for insert
   to authenticated
-  using (true)
-  with check (true);
+  with check (public.is_everest_editor());
+
+drop policy if exists "everest_site_content update" on public.everest_site_content;
+create policy "everest_site_content update"
+  on public.everest_site_content for update
+  to authenticated
+  using (public.is_everest_editor())
+  with check (public.is_everest_editor());
+
+drop policy if exists "everest_site_content delete" on public.everest_site_content;
+create policy "everest_site_content delete"
+  on public.everest_site_content for delete
+  to authenticated
+  using (public.is_everest_editor());
 
 -- ------------------------------------------------------------------- images
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
-  'site-images', 'site-images', true, 10485760,
-  array['image/jpeg','image/png','image/webp','image/gif','image/avif','image/svg+xml']
+  'everest-site-images', 'everest-site-images', true, 10485760,
+  array['image/jpeg','image/png','image/webp','image/gif','image/avif']
 )
 on conflict (id) do update
   set public             = excluded.public,
       file_size_limit    = excluded.file_size_limit,
       allowed_mime_types = excluded.allowed_mime_types;
 
-drop policy if exists "site images read" on storage.objects;
-create policy "site images read"
+-- Every policy below is scoped to bucket_id = 'everest-site-images', so the
+-- CRM's own buckets (notice-pdfs, etc.) are unaffected.
+drop policy if exists "everest images read" on storage.objects;
+create policy "everest images read"
   on storage.objects for select
-  using (bucket_id = 'site-images');
+  using (bucket_id = 'everest-site-images');
 
-drop policy if exists "site images insert" on storage.objects;
-create policy "site images insert"
+drop policy if exists "everest images insert" on storage.objects;
+create policy "everest images insert"
   on storage.objects for insert
   to authenticated
-  with check (bucket_id = 'site-images');
+  with check (bucket_id = 'everest-site-images' and public.is_everest_editor());
 
-drop policy if exists "site images update" on storage.objects;
-create policy "site images update"
+drop policy if exists "everest images update" on storage.objects;
+create policy "everest images update"
   on storage.objects for update
   to authenticated
-  using (bucket_id = 'site-images')
-  with check (bucket_id = 'site-images');
+  using (bucket_id = 'everest-site-images' and public.is_everest_editor())
+  with check (bucket_id = 'everest-site-images' and public.is_everest_editor());
 
-drop policy if exists "site images delete" on storage.objects;
-create policy "site images delete"
+drop policy if exists "everest images delete" on storage.objects;
+create policy "everest images delete"
   on storage.objects for delete
   to authenticated
-  using (bucket_id = 'site-images');
+  using (bucket_id = 'everest-site-images' and public.is_everest_editor());
+
+-- ===========================================================================
+-- AFTER creating the admin user in Authentication -> Users, run this to let
+-- them edit (replace the email):
+--
+--   insert into public.everest_site_editors (user_id)
+--   select id from auth.users where email = 'you@example.com'
+--   on conflict (user_id) do nothing;
+--
+-- To revoke access later, without deleting their account:
+--
+--   delete from public.everest_site_editors
+--   where user_id = (select id from auth.users where email = 'you@example.com');
+-- ===========================================================================
